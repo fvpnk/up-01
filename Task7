@@ -1,0 +1,44 @@
+import javax.swing.*;
+import java.awt.*;
+public class TetrahedronDrawing extends JPanel {
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+
+        int[][] points = {
+                { 150, 80 },
+                { 50, 240 },
+                { 250, 220 },
+                { 180, 310 }
+        };
+
+        g2d.setColor(Color.BLACK);
+        Polygon rightFace = new Polygon();
+        rightFace.addPoint(points[0][0], points[0][1]);
+        rightFace.addPoint(points[2][0], points[2][1]);
+        rightFace.addPoint(points[3][0], points[3][1]);
+        g2d.fillPolygon(rightFace);
+
+        g2d.setColor(Color.BLACK);
+        Polygon leftFace = new Polygon();
+        leftFace.addPoint(points[0][0], points[0][1]);
+        leftFace.addPoint(points[1][0], points[1][1]);
+        leftFace.addPoint(points[3][0], points[3][1]);
+        g2d.drawPolygon(leftFace);
+        float[] dashPattern = { 10, 10 };
+        g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, dashPattern, 0));
+
+        g2d.drawLine(points[1][0], points[1][1], points[2][0], points[2][1]);
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Tetrahedr");
+        TetrahedronDrawing panel = new TetrahedronDrawing();
+        frame.add(panel);
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+
