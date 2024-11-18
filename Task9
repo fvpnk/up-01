@@ -1,0 +1,215 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Arrays;
+import java.util.HashSet;
+
+public class MatematikoGame extends JFrame {
+    private static final int SIZE = 5;
+    private JButton[][] cells = new JButton[SIZE][SIZE];
+    private ArrayList<Integer> deck = new ArrayList<>();
+    private JLabel scoreLabel;
+
+    public MatematikoGame() {
+        setTitle("Игра Математико");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JPanel gridPanel = new JPanel(new GridLayout(SIZE, SIZE));
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                cells[i][j] = new JButton();
+                cells[i][j].setFont(new Font("Arial", Font.BOLD, 20));
+                cells[i][j].addActionListener(new CellClickListener(i, j));
+                gridPanel.add(cells[i][j]);
+            }
+        }
+
+        initializeDeck();
+
+        scoreLabel = new JLabel("Очки: 0");
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        JButton drawButton = new JButton("Вытянуть карточку");
+        drawButton.addActionListener(new DrawCardListener());
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.add(drawButton);
+        controlPanel.add(scoreLabel);
+
+        add(gridPanel, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+
+        setSize(400, 500);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void initializeDeck() {
+        for (int i = 1; i <= 13; i++) {
+            for (int j = 0; j < 4; j++) {
+                deck.add(i);
+            }
+        }
+        Collections.shuffle(deck);
+    }
+
+    private int drawCard() {
+        if (deck.isEmpty()) {
+            return -1;
+        }
+        return deck.remove(deck.size() - 1);
+    }
+
+    private class CellClickListener implements ActionListener {
+        private int row, col;
+
+        public CellClickListener(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int number = drawCard();
+            if (number == -1) {
+                JOptionPane.showMessageDialog(null, "Карточки закончились!");
+                return;
+            }
+            cells[row][col].setText(String.valueOf(number));
+            cells[row][col].setEnabled(false);
+            updateScore();
+        }
+    }
+
+    private class DrawCardListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (deck.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Карточки закончились!");
+            }
+        }
+    }
+
+    private void updateScore() {
+        int score = calculateScore();
+        scoreLabel.setText("Очки: " + score);
+    }
+
+    private int calculateScore() {
+        int score = 0;
+
+        for (int i = 0; i < SIZE; i++) {
+            score += calculateLineScore(getRow(i), false);
+            score += calculateLineScore(getColumn(i), false);
+        }
+
+        score += calculateLineScore(getMainDiagonal(), true);
+        score += calculateLineScore(getSecondaryDiagonal(), true);
+
+        return score;
+    }
+
+    private ArrayList<Integer> getRow(int row) {
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            String text = cells[row][i].getText();
+            if (!text.isEmpty()) {
+                numbers.add(Integer.parseInt(text));
+            }
+        }
+        return numbers;
+    }
+
+    private ArrayList<Integer> getColumn(int col) {
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            String text = cells[i][col].getText();
+            if (!text.isEmpty()) {
+                numbers.add(Integer.parseInt(text));
+            }
+        }
+        return numbers;
+    }
+
+    private ArrayList<Integer> getMainDiagonal() {
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            String text = cells[i][i].getText();
+            if (!text.isEmpty()) {
+                numbers.add(Integer.parseInt(text));
+            }
+        }
+        return numbers;
+    }
+
+    private ArrayList<Integer> getSecondaryDiagonal() {
+        ArrayList<Integer> numbers = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            String text = cells[i][SIZE - i - 1].getText();
+            if (!text.isEmpty()) {
+                numbers.add(Integer.parseInt(text));
+            }
+        }
+        return numbers;
+    }
+
+    private int calculateLineScore(ArrayList<Integer> numbers, boolean isDiagonal) {
+        Map<Integer, Integer> frequency = new HashMap<>();
+        for (int number : numbers) {
+            frequency.put(number, frequency.getOrDefault(number, 0) + 1);
+        }
+
+        int score = 0;
+
+        int pairCount = 0;
+        int threeOfAKind = 0;
+        int fourOfAKind = 0;
+        int singleOnes = 0;
+        boolean hasSequence = numbers.containsAll(Arrays.asList(1, 13, 12, 11, 10));
+
+        for (int count : frequency.values()) {
+            if (count == 2)
+                pairCount++;
+            if (count == 3)
+                threeOfAKind++;
+            if (count == 4)
+                fourOfAKind++;
+            if (count == 1)
+                singleOnes++;
+        }
+
+        if (pairCount == 1)
+            score += isDiagonal ? 20 : 10;
+        if (pairCount == 2)
+            score += isDiagonal ? 30 : 20;
+        if (threeOfAKind == 1)
+            score += isDiagonal ? 50 : 40;
+        if (threeOfAKind == 1 && pairCount == 1)
+            score += isDiagonal ? 90 : 80;
+        if (fourOfAKind == 1)
+            score += isDiagonal ? 170 : 160;
+        if (numbers.size() == 5 && new ArrayList<>(new HashSet<>(numbers)).size() == 5) {
+            score += isDiagonal ? 60 : 50;
+        }
+        if (singleOnes == 3 && frequency.getOrDefault(13, 0) == 2) {
+            score += isDiagonal ? 110 : 100;
+        }
+
+        if (hasSequence) {
+            score += isDiagonal ? 160 : 150;
+        }
+        if (frequency.getOrDefault(1, 0) == 4) {
+            score += isDiagonal ? 210 : 200;
+        }
+        return score;
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(MatematikoGame::new);
+    }
+}
