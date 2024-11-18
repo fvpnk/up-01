@@ -1,0 +1,37 @@
+import java.util.*;
+
+public class Counter {
+    private static final Set<Character> CONSONANTS = new HashSet<>(Arrays.asList(
+            'б', 'в', 'г', 'д', 'ж', 'з', 'й', 'к', 'л', 'м', 'н', 'п', 'р', 'с', 'т', 'ф', 'х', 'ц', 'ч', 'ш', 'щ'));
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите текст:");
+        String inputText = scanner.nextLine().toLowerCase();
+
+        String[] words = inputText.split("\\s+");
+
+        Map<Character, Set<String>> consonantOccurrences = new HashMap<>();
+
+        for (String word : words) {
+            Set<Character> consonantsInWord = new HashSet<>();
+            for (char c : word.toCharArray()) {
+                if (CONSONANTS.contains(c)) {
+                    consonantsInWord.add(c);
+                }
+            }
+            for (char consonant : consonantsInWord) {
+                consonantOccurrences
+                        .computeIfAbsent(consonant, k -> new HashSet<>())
+                        .add(word);
+            }
+        }
+
+        System.out.println("Согласные, встречающиеся не более чем в двух словах:");
+        for (Map.Entry<Character, Set<String>> entry: consonantOccurrences.entrySet()) {
+            if (entry.getValue().size() <= 2) {
+                System.out.print(entry.getKey() + " ");
+            }
+        }
+    }
+}
