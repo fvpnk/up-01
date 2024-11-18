@@ -1,0 +1,72 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProgramSchedule {
+    private List<Channel> channels;
+
+    public ProgramSchedule() {
+        channels = new ArrayList<>();
+    }
+    public void addChannel(String channelName) {
+        channels.add(new Channel(channelName));
+    }
+
+    public void addProgramToChannel(String channelName, String programName) {
+        for (Channel channel : channels) {
+            if (channel.getChannelName().equals(channelName)) {
+                channel.addProgram(programName);
+                return;
+            }
+        }
+        System.out.println("Канал с названием \"" + channelName + "\" не найден.");
+    }
+
+    public void displaySchedule() {
+        for (Channel channel : channels) {
+            System.out.println("Канал: " + channel.getChannelName());
+            channel.displayPrograms();
+        }
+    }
+----
+    public class Channel {
+        private String channelName;
+        private List<String> programs;
+
+        public Channel(String channelName) {
+            this.channelName = channelName;
+            this.programs = new ArrayList<>();
+        }
+
+        public String getChannelName() {
+            return channelName;
+        }
+
+        public void addProgram(String programName) {
+            programs.add(programName);
+        }
+
+        public void displayPrograms() {
+            if (programs.isEmpty()) {
+                System.out.println("  Нет программ для отображения.");
+            } else {
+                for (String program : programs) {
+                    System.out.println("  Программа: " + program);
+                }
+            }
+        }
+    }
+    public static void main(String[] args) {
+        ProgramSchedule schedule = new ProgramSchedule();
+        schedule.addChannel("Первый канал");
+        schedule.addChannel("Россия 1");
+        schedule.addChannel("НТВ");
+
+        schedule.addProgramToChannel("Первый канал", "Новости");
+        schedule.addProgramToChannel("Первый канал", "Большая игра");
+        schedule.addProgramToChannel("Россия 1", "Вести");
+        schedule.addProgramToChannel("НТВ", "Сегодня");
+
+        schedule.displaySchedule();
+    }
+}
+
