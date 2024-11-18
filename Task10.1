@@ -1,0 +1,22 @@
+section .data
+    N dd 10              ; N = 10 (32бит)
+    fmt db "N = %d", 10, 0
+
+section .text
+    extern printf        
+
+global main             
+main:
+    mov eax, [N]       ; Задание
+    shr eax, 1         
+    mov [N], eax       
+
+    ; Вывод значения N
+    push eax 
+    push fmt        
+    call printf    
+    add esp, 8  
+
+    ; Завершение программы
+    mov eax, 0         
+    ret   
