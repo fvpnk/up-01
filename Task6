@@ -1,0 +1,165 @@
+import java.io.IOException;
+import java.util.Objects;
+
+class InvalidKeyException extends Exception {
+    public InvalidKeyException(String message) {
+        super(message);
+    }
+}
+
+class InvalidPedalException extends Exception {
+    public InvalidPedalException(String message) {
+        super(message);
+    }
+}
+
+class Key {
+    private String note;
+
+    public Key(String note) throws IllegalArgumentException {
+        if (note == null || note.isEmpty()) {
+            throw new IllegalArgumentException("Значение ноты не может быть пустым.");
+        }
+        this.note = note;
+    }
+
+    public void press() {
+        System.out.println("Нажата клавиша с нотой: " + note);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Key key = (Key) o;
+        return Objects.equals(note, key.note);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(note);
+    }
+
+    @Override
+    public String toString() {
+        return "Key{" +
+                "note='" + note + '\'' +
+                '}';
+    }
+}
+
+class Pedal {
+    private String type;
+
+    public Pedal(String type) throws IllegalArgumentException {
+        if (type == null || type.isEmpty()) {
+            throw new IllegalArgumentException("Тип педали не может быть пустым.");
+        }
+        this.type = type;
+    }
+
+    public void press() {
+        System.out.println("Нажата педаль: " + type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Pedal pedal = (Pedal) o;
+        return Objects.equals(type, pedal.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
+    }
+
+    @Override
+    public String toString() {
+        return "Pedal{" +
+                "type='" + type + '\'' +
+                '}';
+    }
+}
+
+class Piano {
+    private Key[] keys;
+    private Pedal[] pedals;
+    public Piano(Key[] keys, Pedal[] pedals) throws IOException {
+        if (keys == null || pedals == null) {
+            throw new IOException("Не удалось создать пианино: отсутствуют клавиши или педали.");
+        }
+        this.keys = keys;
+        this.pedals = pedals;
+    }
+    public void tune() {
+        System.out.println("Пианино настроено.");
+    }
+    public void play() {
+        System.out.println("Игра на пианино.");
+        for (Key key : keys) {
+            key.press();
+        }
+    }
+    public void pressKey(int index) throws InvalidKeyException {
+        if (index < 0 || index >= keys.length) {
+            throw new InvalidKeyException("Нет клавиши с индексом: " + index);
+        }
+        keys[index].press();
+    }
+    public void pressPedal(int index) throws InvalidPedalException {
+        if (index < 0 || index >= pedals.length) {
+            throw new InvalidPedalException("Нет педали с индексом: " + index);
+        }
+        pedals[index].press();
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Piano piano = (Piano) o;
+        return Objects.equals(keys, piano.keys) && Objects.equals(pedals, piano.pedals);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(keys, pedals);
+    }
+    @Override
+    public String toString() {
+        return "Piano{" +
+                "keys=" + keys.length +
+                ", pedals=" + pedals.length +
+                '}';
+    }
+}
+public class Mainpianino {
+    public static void main(String[] args) {
+        try {
+            Key[] keys = { new Key("До"), new Key("Ре"), new Key("Ми"), new Key("Фа") };
+            Pedal[] pedals = { new Pedal("Правая"), new Pedal("Левая") };
+            Piano piano = new Piano(keys, pedals);
+            piano.tune();
+            piano.play();
+
+            piano.pressKey(1); 
+            piano.pressPedal(0); 
+            piano.pressKey(10); 
+
+        } catch (InvalidKeyException | InvalidPedalException e) {
+            System.err.println("Ошибка: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Ошибка ввода/вывода: " + e.getMessage());
+        } catch (OutOfMemoryError e) {
+            System.err.println("Ошибка: недостаточно памяти для выполнения операции.");
+        }
+    }
+}
