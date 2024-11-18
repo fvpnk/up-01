@@ -1,0 +1,206 @@
+class DoublyLinkedList {
+    private Node head;
+    private Node tail;
+
+    private static class Node {
+        int data;
+        Node next;
+        Node prev;
+
+        Node(int data) {
+            this.data = data;
+        }
+    }
+
+    public void initialize() {
+        head = null;
+        tail = null;
+    }
+
+    public void destroy() {
+        head = null;
+        tail = null;
+    }
+
+    public void insertAtEnd(int data) {
+        Node newNode = new Node(data);
+        if (tail == null) {
+            head = tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+    }
+
+    public void insertBefore(int beforeData, int newData) {
+        Node current = head;
+        while (current != null && current.data != beforeData) {
+            current = current.next;
+        }
+        if (current != null) {
+            Node newNode = new Node(newData);
+            newNode.next = current;
+            newNode.prev = current.prev;
+            if (current.prev != null) {
+                current.prev.next = newNode;
+            } else {
+                head = newNode;
+            }
+            current.prev = newNode;
+        }
+    }
+
+    public void delete(int data) {
+        Node current = head;
+        while (current != null && current.data != data) {
+            current = current.next;
+        }
+        if (current != null) {
+            if (current.prev != null) {
+                current.prev.next = current.next;
+            } else {
+                head = current.next;
+            }
+            if (current.next != null) {
+                current.next.prev = current.prev;
+            } else {
+                tail = current.prev;
+            }
+        }
+    }
+
+    public Integer getFirst() {
+        return head != null ? head.data : null;
+    }
+
+    public Integer getLast() {
+        return tail != null ? tail.data : null;
+    }
+
+    public String display() {
+        StringBuilder listContents = new StringBuilder("List: ");
+        Node current = head;
+        while (current != null) {
+            listContents.append(current.data).append(" ");
+            current = current.next;
+        }
+        return listContents.toString();
+    }
+}
+
+Файл GUI.java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class GUI extends JFrame {
+    private DoublyLinkedList list = new DoublyLinkedList();
+    private JTextArea outputArea;
+    private JTextField inputField;
+
+    public GUI() {
+        setTitle("Linked List GUI");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        add(new JScrollPane(outputArea), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        inputField = new JTextField();
+        panel.add(inputField);
+
+        JButton initBtn = new JButton("Initialize List");
+        initBtn.addActionListener(e -> {
+            list.initialize();
+            displayOutput("List initialized.");
+        });
+        panel.add(initBtn);
+
+        JButton destroyBtn = new JButton("Destroy List");
+        destroyBtn.addActionListener(e -> {
+            list.destroy();
+            displayOutput("List destroyed.");
+        });
+        panel.add(destroyBtn);
+
+        JButton insertEndBtn = new JButton("Insert at End");
+        insertEndBtn.addActionListener(e -> {
+            int value = getInput();
+            if (value != Integer.MIN_VALUE) {
+                list.insertAtEnd(value);
+                displayOutput("Inserted at end: " + value);
+            }
+        });
+        panel.add(insertEndBtn);
+
+        JButton insertBeforeBtn = new JButton("Insert Before");
+        insertBeforeBtn.addActionListener(e -> {
+            String[] parts = inputField.getText().split(",");
+            if (parts.length == 2) {
+                try {
+                    int beforeValue = Integer.parseInt(parts[0].trim());
+                    int newValue = Integer.parseInt(parts[1].trim());
+                    list.insertBefore(beforeValue, newValue);
+                    displayOutput("Inserted " + newValue + " before " + beforeValue);
+                } catch (NumberFormatException ex) {
+                    displayOutput("Invalid input. Please enter two integers separated by a comma.");
+                }
+            } else {
+                displayOutput("Please enter two numbers separated by a comma.");
+            }
+        });
+        panel.add(insertBeforeBtn);
+
+        JButton deleteBtn = new JButton("Delete Element");
+        deleteBtn.addActionListener(e -> {
+            int value = getInput();
+            if (value != Integer.MIN_VALUE) {
+                list.delete(value);
+                displayOutput("Deleted: " + value);
+            }
+        });
+        panel.add(deleteBtn);
+
+        JButton getFirstBtn = new JButton("Get First Element");
+        getFirstBtn.addActionListener(e -> {
+            Integer first = list.getFirst();
+            displayOutput("First element: " + (first != null ? first : "List is empty"));
+        });
+        panel.add(getFirstBtn);
+
+        JButton getLastBtn = new JButton("Get Last Element");
+        getLastBtn.addActionListener(e -> {
+            Integer last = list.getLast();
+            displayOutput("Last element: " + (last != null ? last : "List is empty"));
+        });
+        panel.add(getLastBtn);
+
+        JButton displayBtn = new JButton("Display List");
+        displayBtn.addActionListener(e -> displayOutput(list.display()));
+        panel.add(displayBtn);
+
+        add(panel, BorderLayout.SOUTH);
+    }
+
+    private int getInput() {
+        try {
+            return Integer.parseInt(inputField.getText().trim());
+        } catch (NumberFormatException ex) {
+            displayOutput("Invalid input. Please enter a number.");
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private void displayOutput(String message) {
+        outputArea.append(message + "\n");
+        inputField.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GUI().setVisible(true));
+    }
+}
