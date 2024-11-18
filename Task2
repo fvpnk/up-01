@@ -1,0 +1,107 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class House {
+    private int id;
+    private int apartmentNumber;
+    private double area;
+    private int floor;
+    private int numberOfRooms;
+    private String street;
+    private String buildingType;
+    private int yearsInUse;
+
+    public House(int id, int apartmentNumber, double area, int floor, int numberOfRooms, String street,
+            String buildingType, int yearsInUse) {
+        this.id = id;
+        this.apartmentNumber = apartmentNumber;
+        this.area = area;
+        this.floor = floor;
+        this.numberOfRooms = numberOfRooms;
+        this.street = street;
+        this.buildingType = buildingType;
+        this.yearsInUse = yearsInUse;
+    }
+
+    public House() {
+        this(0, 0, 0.0, 0, 0, "Unknown", "Unknown", 0);
+    }
+
+    public int getNumberOfRooms() {
+        return numberOfRooms;
+    }
+
+    public int getFloor() {
+        return floor;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    @Override
+    public String toString() {
+        return "House{" +
+                "id=" + id +
+                ", apartmentNumber=" + apartmentNumber +
+                ", area=" + area +
+                ", floor=" + floor +
+                ", numberOfRooms=" + numberOfRooms +
+                ", street='" + street + '\'' +
+                ", buildingType='" + buildingType + '\'' +
+                ", yearsInUse=" + yearsInUse +
+                '}';
+    }
+}
+
+public class hata {
+    public static void main(String[] args) {
+        ArrayList<House> houses = new ArrayList<>();
+        houses.add(new House(1, 101, 45.5, 2, 2, "Main Street", "Brick", 10));
+        houses.add(new House(2, 102, 60.0, 3, 3, "2 Street", "Panel", 5));
+        houses.add(new House(3, 103, 75.0, 5, 4, "3 Street", "Monolithic", 15));
+        houses.add(new House(4, 104, 55.0, 7, 3, "Main Street", "Brick", 12));
+        houses.add(new House(5, 105, 80.0, 8, 4, "4 Street", "Panel", 8));
+        houses.add(new House(6, 106, 90.5, 10, 5, "5 Street", "Monolithic", 20));
+        houses.add(new House(7, 107, 42.0, 1, 1, "Main Street", "Brick", 25));
+        houses.add(new House(8, 108, 66.5, 6, 3, "2 Street", "Panel", 6));
+        houses.add(new House(9, 109, 78.0, 4, 4, "3 Street", "Brick", 12));
+        houses.add(new House(10, 110, 58.5, 9, 3, "6 Street", "Monolithic", 10));
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Введите количество комнат для поиска квартир:");
+        int rooms = scanner.nextInt();
+        System.out.println("Квартиры с " + rooms + " комнатами:");
+        for (House house : houses) {
+            if (house.getNumberOfRooms() == rooms) {
+                System.out.println(house);
+            }
+        }
+
+        System.out.println("\nВведите количество комнат для поиска квартир с диапазоном этажей:");
+        rooms = scanner.nextInt();
+        System.out.println("Введите минимальный этаж:");
+        int minFloor = scanner.nextInt();
+        System.out.println("Введите максимальный этаж:");
+        int maxFloor = scanner.nextInt();
+
+        System.out.println(
+                "Квартиры с " + rooms + " комнатами и этажом в диапазоне от " + minFloor + " до " + maxFloor + ":");
+        for (House house : houses) {
+            if (house.getNumberOfRooms() == rooms && house.getFloor() >= minFloor && house.getFloor() <= maxFloor) {
+                System.out.println(house);
+            }
+        }
+
+        System.out.println("\nВведите минимальную площадь для поиска квартир:");
+        double area = scanner.nextDouble();
+        System.out.println("Квартиры с площадью более " + area + " кв. метров:");
+        for (House house : houses) {
+            if (house.getArea() > area) {
+                System.out.println(house);
+            }
+        }
+    }
+}
+
